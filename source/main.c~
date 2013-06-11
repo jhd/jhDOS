@@ -1,0 +1,7 @@
+#include <stddef.h>
+#include <stdint.h>
+
+void kernel_main(){
+	terminal_initialize();
+	terminal_writestring("Welcome to jhDOS!\n\tTabs you say");
+}
