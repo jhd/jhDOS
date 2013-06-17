@@ -6,15 +6,12 @@
 #include "memtest.h"
 #include "memory.h"
 
+extern uint32_t endkernel;
+uint32_t* kernelEnd;
+
 void kernel_main(multiboot_info_t* mbd, unsigned int magic){
 	terminal_initialize();
-	terminal_writestring("Welcome to jhDOS!\n\tTabs you say?\nNumber three thousand: ");
-    terminalWriteInt(3000);
-    terminal_writestring("! : ");
-    terminalWriteHexInt(3000);
-    terminal_writestring("! : ");
-    terminalWriteBinInt(3000);
-    terminal_writestring("!\n");
+	terminal_writestring("Welcome to jhDOS!\n");
     unsigned int cr0Val;
     asm volatile("mov %%cr0, %0" : "=r"(cr0Val));
     if((cr0Val & 1) == 1){
@@ -23,8 +20,9 @@ void kernel_main(multiboot_info_t* mbd, unsigned int magic){
     else{
         terminal_writestring("CPU is in real mode\n");
     }
-
-    terminalWriteBinInt(mbd->flags);
+    terminal_writestring("Kernel ends at: ");
+    kernelEnd = &endkernel;
+    terminalWriteHexInt(kernelEnd);
     terminal_writestring("\n");
 
     memory_printMMap(mbd);
