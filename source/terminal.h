@@ -1,6 +1,10 @@
 #ifndef TERMINAL_H
 #define TERMINAL_H
 
+#include <stddef.h>
+#include <stdint.h>
+
+
 enum vga_color
 {
     COLOR_BLACK = 0,
@@ -32,8 +36,10 @@ void terminal_putchar(char c);
 void terminal_writestring(const char* data);
 void terminalWriteInt(int number);
 void terminalWriteHexInt(int number);
+void terminalWriteHexLong(unsigned int upper, unsigned int lower);
 void terminalWriteBinInt(int number);
 char* intToString(int number, char* string, int base);
+char* intToStringPadded(int number, char* string, int base);
 void reverse(char* string);
 
 #endif

@@ -117,10 +117,39 @@ void terminalWriteHexInt(int number){
     terminal_writestring(intToString(number, string, 16));
 }
 
+void terminalWriteHexLong(unsigned int upper, unsigned int lower){
+    char string[12];
+    terminal_writestring("0x");
+    terminal_writestring(intToString(upper, string, 16));
+    terminal_writestring(" ");
+    terminal_writestring(intToStringPadded(lower, string, 16));
+}
+
 void terminalWriteBinInt(int number){
     char string[33];
     terminal_writestring("0b");
     terminal_writestring(intToString(number, string, 2));
+}
+
+char* intToStringPadded(int number, char* string, int base){
+    int i, sign;
+     if ((sign = number) < 0)  /* record sign */
+         number = -number;          /* make n positive */
+     i = 0;
+     do {       /* generate digits in reverse order */
+        char digit = number % base;
+        if(digit < 10){
+            string[i++] = digit + '0';   /* get next digit */
+        }
+        else{
+            string[i++] = 'A' + digit - 10;
+        }
+     } while ((number /= base) > 0);     /* delete it */
+     if (sign < 0)
+         string[i++] = '-';
+     string[i] = '\0';
+     reverse(string);
+     return string;
 }
 
 char* intToString(int number, char* string, int base){

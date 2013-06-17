@@ -1,0 +1,18 @@
+#ifndef MEMORY_H
+#define MEMORY_H
+
+#include "multiboot.h"
+
+typedef struct grub_memory_map {
+	unsigned int size;
+	unsigned int base_addr_low,base_addr_high;
+// You can also use: unsigned long long int base_addr; if supported.
+	unsigned int length_low,length_high;
+// You can also use: unsigned long long int length; if supported.
+	unsigned int type;
+} grub_memory_map_t;
+
+    void memory_printMMap(multiboot_info_t* mbd);
+    void memory_printMMapEntry(grub_memory_map_t* mmap);
+
+#endif
