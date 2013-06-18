@@ -41,8 +41,12 @@ void kernel_main(multiboot_info_t* mbd, unsigned int magic){
 
         terminalWriteHexInt(physicalMemoryManagerAddress);
         terminal_writestring("\n");
-        uint32_t* ptr = *(physicalMemoryManagerAddress);
-        terminalWriteHexInt(*(ptr));
+        /*uint32_t* ptr = *(physicalMemoryManagerAddress);
+        terminalWriteHexInt(*(ptr));*/
+        uint32_t* page = physicalMemoryManager_getPage();
+        terminalWriteHexInt(page);
+        terminal_writestring("\n");
+        physicalMemoryManager_freePage(page);
 
     }
 

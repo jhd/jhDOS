@@ -7,6 +7,8 @@
 
 #define SIZE_OF_STRUCTURE_ENTRY 0.125
 
+uint32_t* startOfManagementStructure;
+
 /* Functions for managing physical memory 
  * Note that this is currently limited to the contigous block of memory containg the kernel */
 
@@ -84,11 +86,33 @@ uint32_t* initialisePhysicalMemory(multiboot_info_t* mbd, uint32_t* kernelEnd){
         *(nextPageBoundry + i + 1) = nextPageAfterManagementStructure + i * 4096;
 
     }
-
+    
+    startOfManagementStructure = nextPageBoundry;
     return (uint32_t)nextPageBoundry;
 }
 
-void __physicalMemory_markAsInUse(){
+uint32_t* physicalMemoryManager_getPage(){
+
+    if(*(startOfManagementStructure) == startOfManagementStructure){
+        
+        /* The stack is empty */
+
+        return 0;
+
+    }
+
+    *startOfManagementStructure--;
+
+    uint32_t* ptr = *(startOfManagementStructure + 1);
+
+    return *ptr;
+}
+
+void physicalMemoryManager_freePage(uint32_t* page){
+
+    *startOfManagementStructure++;
+    uint32_t* ptr = *startOfManagementStructure;
+    *ptr = page;
 
 }
 

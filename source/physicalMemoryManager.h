@@ -5,5 +5,7 @@
 #include <stdint.h>
 
     uint32_t* initialisePhysicalMemory(multiboot_info_t* mbd, uint32_t* kernelEnd);
+    uint32_t* physicalMemoryManager_getPage();
+    void physicalMemoryManager_freePage(uint32_t* page);
 
 #endif
