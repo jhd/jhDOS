@@ -4,6 +4,6 @@
 #include "multiboot.h"
 #include <stdint.h>
 
-    int initialisePhysicalMemory(multiboot_info_t* mbd, uint32_t* kernelEnd);
+    uint32_t* initialisePhysicalMemory(multiboot_info_t* mbd, uint32_t* kernelEnd);
 
 #endif

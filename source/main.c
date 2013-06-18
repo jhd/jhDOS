@@ -5,6 +5,7 @@
 #include "multiboot.h"
 #include "memtest.h"
 #include "memory.h"
+#include "physicalMemoryManager.h"
 
 extern uint32_t endkernel;
 uint32_t* kernelEnd;
@@ -26,6 +27,25 @@ void kernel_main(multiboot_info_t* mbd, unsigned int magic){
     terminal_writestring("\n");
 
     memory_printMMap(mbd);
+
+    terminal_writestring("Initalising physical memory manager...\n");
+    uint32_t* physicalMemoryManagerAddress = initialisePhysicalMemory(mbd, kernelEnd);
+    if(physicalMemoryManagerAddress == 0){
+        
+        terminal_writestring("Error in initialising memory\n");
+        return;
+
+    }
+    
+    else{
+
+        terminalWriteHexInt(physicalMemoryManagerAddress);
+        terminal_writestring("\n");
+        uint32_t* ptr = *(physicalMemoryManagerAddress);
+        terminalWriteHexInt(*(ptr));
+
+    }
+
 /*
     if(memCheck(mbd) == 1){
         terminal_writestring("Avaliable low memory: ");

@@ -1,5 +1,5 @@
 CC = i586-elf-gcc
-CFLAGS = -std=gnu99 -ffreestanding -O2 -Wall -Wextra -s
+CFLAGS = -std=gnu99 -ffreestanding -O2 -Wall -Wextra -s -g
 LINKSCRIPT = linker.ld
 
 SRC = $(wildcard *.c)
