@@ -46,8 +46,14 @@ uint32_t* initialisePhysicalMemory(multiboot_info_t* mbd, uint32_t* kernelEnd){
 
     /* Find next page aligned boundry after the end of the kernel */
     
-    uint32_t* nextPageBoundry = kernelEnd + ((uint32_t)kernelEnd % 4196);
-    
+    uint32_t* nextPageBoundry = kernelEnd;// - ((uint32_t)kernelEnd % 4196) + ((uint32_t)kernelEnd % 4196 == 0? 0 : 4196);
+
+    if ((uint32_t)nextPageBoundry % 4096 != 0){
+
+        nextPageBoundry += (4096 - (uint32_t)nextPageBoundry % 4096)/4;
+
+    }
+
     if(nextPageBoundry > kernelMemoryBlockStart + kernelMemoryBlockLength){
 
         /* Next page boundry is outside of avaliable memory */
