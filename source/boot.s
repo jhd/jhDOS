@@ -58,6 +58,7 @@ _start:
     # assembly file, so we'll create a kernel.c file in a moment. In that file,
     # we'll create a C entry point called kernel_main and call it here.
     
+    push %eax
     push %ebx 
     call kernel_main
 

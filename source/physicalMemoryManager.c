@@ -19,8 +19,8 @@ uint32_t* initialisePhysicalMemory(multiboot_info_t* mbd, uint32_t* kernelEnd){
     memory_map_t* mmap = (memory_map_t*)mbd->mmap_addr;
 
     uint32_t kernelMemoryBlockStart = 0x100000;
-    uint32_t kernelMemoryBlockLength;
-    uint32_t kernelSize;
+    uint32_t kernelMemoryBlockLength = 0;
+    uint32_t kernelSize = 0;
 
     while((unsigned int)mmap < mbd->mmap_addr + mbd->mmap_length){
         
@@ -44,6 +44,14 @@ uint32_t* initialisePhysicalMemory(multiboot_info_t* mbd, uint32_t* kernelEnd){
         mmap = (memory_map_t*) ( (unsigned int)mmap + mmap->size + sizeof(unsigned int) );
     }
 
+    if(kernelSize == 0){
+        
+        /* If the kernel could not be found */
+
+        return 0;
+
+    }
+
     /* Find next page aligned boundry after the end of the kernel */
     
     uint32_t* nextPageBoundry = kernelEnd;// - ((uint32_t)kernelEnd % 4196) + ((uint32_t)kernelEnd % 4196 == 0? 0 : 4196);
@@ -54,7 +62,7 @@ uint32_t* initialisePhysicalMemory(multiboot_info_t* mbd, uint32_t* kernelEnd){
 
     }
 
-    if(nextPageBoundry > kernelMemoryBlockStart + kernelMemoryBlockLength){
+    if((uint32_t)nextPageBoundry > kernelMemoryBlockStart + kernelMemoryBlockLength){
 
         /* Next page boundry is outside of avaliable memory */
         /* TODO Attempt to find another suitable area to store the structure */
@@ -74,32 +82,32 @@ uint32_t* initialisePhysicalMemory(multiboot_info_t* mbd, uint32_t* kernelEnd){
     if(sizeOfManagementStructureInPages > numberOfKernelBlockPages - sizeOfKernelInPages){
         
         /* There is not enough space after the boundry to store the management structure */
-        /* TODO Sttempt to find another suitable space for the structure */
+        /* TODO Attempt to find another suitable space for the structure */
 
         return 0;
     }
 
     /* Create management structure */
     
-    *(nextPageBoundry) = numberOfAvaliablePages + nextPageBoundry;
+    *nextPageBoundry = (uint32_t)(numberOfAvaliablePages + nextPageBoundry);
 
     /* Initalise management structure */
 
-    uint32_t* nextPageAfterManagementStructure = nextPageBoundry + sizeOfManagementStructureInPages * 4096;
+    uint32_t* nextPageAfterManagementStructure = (uint32_t*)((uint32_t)nextPageBoundry + sizeOfManagementStructureInPages * 4096);
         
     for(uint32_t i = 0; i < numberOfAvaliablePages; i++){
 
-        *(nextPageBoundry + i + 1) = nextPageAfterManagementStructure + i * 4096;
+        *(nextPageBoundry + i + 1) = (uint32_t)nextPageAfterManagementStructure + i * 4096;
 
     }
     
     startOfManagementStructure = nextPageBoundry;
-    return (uint32_t)nextPageBoundry;
+    return nextPageBoundry;
 }
 
 uint32_t* physicalMemoryManager_getPage(){
 
-    if(*(startOfManagementStructure) == startOfManagementStructure){
+    if(*(startOfManagementStructure) == (uint32_t)startOfManagementStructure){
         
         /* The stack is empty */
 
@@ -107,18 +115,19 @@ uint32_t* physicalMemoryManager_getPage(){
 
     }
 
-    *startOfManagementStructure--;
+    (*startOfManagementStructure) -= 4;
 
-    uint32_t* ptr = *(startOfManagementStructure + 1);
+    uint32_t* ptr = (uint32_t*)(*(startOfManagementStructure) + 4);
 
-    return *ptr;
+    return (uint32_t*)*ptr;
+
 }
 
 void physicalMemoryManager_freePage(uint32_t* page){
 
-    *startOfManagementStructure++;
-    uint32_t* ptr = *startOfManagementStructure;
-    *ptr = page;
+    (*startOfManagementStructure) += 4;
+    uint32_t* ptr = (uint32_t*)*startOfManagementStructure;
+    *ptr = (uint32_t)page;
 
 }
 

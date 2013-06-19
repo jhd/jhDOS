@@ -11,7 +11,16 @@ extern uint32_t endkernel;
 uint32_t* kernelEnd;
 
 void kernel_main(multiboot_info_t* mbd, unsigned int magic){
+
 	terminal_initialize();
+
+    if(magic != MULTIBOOT_BOOTLOADER_MAGIC){
+        
+        terminal_writestring("Error: Non-multiboot bootloader used");
+        return;
+
+    }
+
 	terminal_writestring("Welcome to jhDOS!\n");
     unsigned int cr0Val;
     asm volatile("mov %%cr0, %0" : "=r"(cr0Val));
@@ -23,7 +32,7 @@ void kernel_main(multiboot_info_t* mbd, unsigned int magic){
     }
     terminal_writestring("Kernel ends at: ");
     kernelEnd = &endkernel;
-    terminalWriteHexInt(kernelEnd);
+    terminalWriteHexInt((int32_t)kernelEnd);
     terminal_writestring("\n");
 
     memory_printMMap(mbd);
@@ -39,12 +48,12 @@ void kernel_main(multiboot_info_t* mbd, unsigned int magic){
     
     else{
 
-        terminalWriteHexInt(physicalMemoryManagerAddress);
+        terminalWriteHexInt((int32_t)physicalMemoryManagerAddress);
         terminal_writestring("\n");
         /*uint32_t* ptr = *(physicalMemoryManagerAddress);
         terminalWriteHexInt(*(ptr));*/
         uint32_t* page = physicalMemoryManager_getPage();
-        terminalWriteHexInt(page);
+        terminalWriteHexInt((int32_t)page);
         terminal_writestring("\n");
         physicalMemoryManager_freePage(page);
 
