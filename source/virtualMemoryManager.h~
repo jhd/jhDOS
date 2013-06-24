@@ -1,0 +1,9 @@
+#ifndef VIRTUALMEMORYMANAGER_H
+#define VIRTUALMEMORYMANAGER_H
+
+#include <stdint.h>
+
+    uint32_t intialisePaging(uint32_t numberOfInUsePages);
+    void mapPage(uint32_t* pageDirectory, void* physicalAddress, void* virtualAddress, uint32_t flags);
+
+#endif
