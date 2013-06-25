@@ -2,6 +2,8 @@
 #define KMALLOC_C
 
 #include "physicalMemoryManager.h"
+#include "kmalloc.h"
+
 #include <stddef.h>
 
 uint32_t* kmallocStartPage;
@@ -28,42 +30,88 @@ uint32_t* initialiseKmalloc(){
 }
 
 void* kmalloc(uint32_t bytes){
+
+    if(bytes > 4096 - 6 * sizeof(uint32_t)){
+
+        return NULL;
+
+    }
     
     uint32_t* currentBlock = nextFreeBlock;
 
-    while(*(currentBlock + 2) != (uint32_t)NULL){
+    uint32_t* previousBlock = NULL;
+
+    /* While we are not at the last block */
+
+    while(*(currentBlock) != (uint32_t)NULL){
 
         /* Until we reach the end of allocated pages */
 
-        if(*(currentBlock) * -1 > bytes + 3){
+        if((int32_t)*(currentBlock) * -1 > (int32_t)(bytes + 12)){
 
             /* The next free block has enough space to allocate bytes */
 
-            *((uint32_t*)*(currentBlock + 2)) = (uint32_t)(currentBlock + bytes + 3);
+            uint32_t* nextBlock = (uint32_t*)((uint32_t)currentBlock + bytes + 12);
+
+            //*((uint32_t*)*(currentBlock + 2)) = (uint32_t)(currentBlock + bytes + 12);
             
             /* Size of free block = previous size - (bytes + 3 * int) */
 
-            *(currentBlock + bytes + 3) = *currentBlock + (bytes + 3);
+            *(nextBlock) = *currentBlock + (bytes + 12);
 
             /* Next Block.prev = currentBlock */
 
-            *(currentBlock + bytes + 4) = *currentBlock;
+            *(nextBlock + 1) = (uint32_t)currentBlock;
 
             /*Next block.next = current block.next */
 
-            *(currentBlock + bytes + 5) = *(currentBlock + 2);
+            *(nextBlock + 2) = *(currentBlock + 2);
 
-            *currentBlock = bytes + 3;
+            *currentBlock = bytes + 12;
 
-            *(currentBlock + 2) = (uint32_t)currentBlock + bytes + 3;
+            *(currentBlock + 2) = (uint32_t)nextBlock;
 
-            return (void*)((uint32_t)currentBlock + 3);
+            if(currentBlock == nextFreeBlock){
+
+                nextFreeBlock = *(currentBlock + 2);
+
+            }
+
+            return (void*)((uint32_t)currentBlock + 12);
 
         }
 
+        previousBlock = currentBlock;
+
+        currentBlock = (uint32_t*)*(uint32_t*)((uint32_t)currentBlock + 2);
+
     }
 
-    return NULL;
+    /* Get new page and use that to allocate the memory */
+
+    uint32_t* newPage = physicalMemoryManager_getPage();
+
+    if(newPage == NULL){
+
+        return NULL;
+
+    }
+
+    *(previousBlock + 2) = (uint32_t)newPage;
+    
+    *newPage = 4096 - (bytes + 6 * sizeof(uint32_t));
+
+    *(newPage + 1) = (uint32_t)previousBlock;
+
+    *(newPage + 2) = (uint32_t)NULL;
+
+    *(newPage + bytes + 3) = -4096 + 6 + bytes;
+
+    *(newPage + bytes + 4) = (uint32_t)newPage;
+
+    *(newPage + bytes + 5) = (uint32_t)NULL;
+
+    return (void*)((uint32_t)newPage + 3);
 
 }
 

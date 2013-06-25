@@ -6,6 +6,7 @@
 #include "memtest.h"
 #include "memory.h"
 #include "physicalMemoryManager.h"
+#include "kmalloc.h"
 
 extern uint32_t endkernel;
 uint32_t* kernelEnd;
@@ -58,7 +59,27 @@ void kernel_main(multiboot_info_t* mbd, unsigned int magic){
         physicalMemoryManager_freePage(page);
 
     }
+    
+    terminal_writestring("Initialising kmalloc...\n");
 
+    uint32_t* kmallocStart = initialiseKmalloc();
+
+    terminalWriteHexInt((int32_t)kmallocStart);
+
+    terminal_writestring("\n");
+
+    uint32_t* testMemory = kmalloc(20);
+
+    terminalWriteHexInt((int32_t)testMemory);
+
+    terminal_writestring("\n");
+
+    uint32_t* testMemory2 = kmalloc(20);
+
+    terminalWriteHexInt((int32_t)testMemory2);
+
+    terminal_writestring("\n");
+   
 /*
     if(memCheck(mbd) == 1){
         terminal_writestring("Avaliable low memory: ");
