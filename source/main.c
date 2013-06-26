@@ -79,6 +79,13 @@ void kernel_main(multiboot_info_t* mbd, unsigned int magic){
     terminalWriteHexInt((int32_t)testMemory2);
 
     terminal_writestring("\n");
+
+    uint32_t* testMemory3 = kmalloc(4070);
+
+    terminalWriteHexInt((int32_t)testMemory3);
+
+    terminal_writestring("\n");
+
    
 /*
     if(memCheck(mbd) == 1){

@@ -73,7 +73,7 @@ void* kmalloc(uint32_t bytes){
 
             if(currentBlock == nextFreeBlock){
 
-                nextFreeBlock = *(currentBlock + 2);
+                nextFreeBlock = (uint32_t*)*(currentBlock + 2);
 
             }
 
@@ -99,19 +99,21 @@ void* kmalloc(uint32_t bytes){
 
     *(previousBlock + 2) = (uint32_t)newPage;
     
-    *newPage = 4096 - (bytes + 6 * sizeof(uint32_t));
+    uint32_t* nextBlock = (uint32_t*)((uint32_t)newPage + bytes + 12);
+
+    *newPage = bytes + 6 * sizeof(uint32_t);
 
     *(newPage + 1) = (uint32_t)previousBlock;
 
-    *(newPage + 2) = (uint32_t)NULL;
+    *(newPage + 2) = (uint32_t)nextBlock;
 
-    *(newPage + bytes + 3) = -4096 + 6 + bytes;
+    *(nextBlock) = -4096 + 6 * sizeof(uint32_t) + bytes;
 
-    *(newPage + bytes + 4) = (uint32_t)newPage;
+    *(nextBlock + 1) = (uint32_t)newPage;
 
-    *(newPage + bytes + 5) = (uint32_t)NULL;
+    *(nextBlock + 2) = (uint32_t)NULL;
 
-    return (void*)((uint32_t)newPage + 3);
+    return (void*)((uint32_t)newPage + 3 * sizeof(uint32_t));
 
 }
 
