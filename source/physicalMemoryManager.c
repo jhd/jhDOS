@@ -70,12 +70,12 @@ uint32_t* initialisePhysicalMemory(multiboot_info_t* mbd, uint32_t* kernelEnd){
         return 0;
     }
 
-    /* Check that there is enough space afeter the boundry to store the management structure */
+    /* Check that there is enough space after the boundry to store the management structure */
 
-    uint32_t numberOfKernelBlockPages = kernelMemoryBlockLength / 4196 + (kernelMemoryBlockLength % 4196 == 0 ? 0 : 1);
-    uint32_t sizeOfKernelInPages = kernelSize / 4196 + (kernelSize % 4196 == 0? 0 : 1);
+    uint32_t numberOfKernelBlockPages = kernelMemoryBlockLength / 4096 + (kernelMemoryBlockLength % 4096 == 0 ? 0 : 1);
+    uint32_t sizeOfKernelInPages = kernelSize / 4096 + (kernelSize % 4096 == 0? 0 : 1);
     uint32_t sizeOfManagementStructure = numberOfKernelBlockPages * sizeof(uint32_t*);
-    uint32_t sizeOfManagementStructureInPages = sizeOfManagementStructure / 4196 + (sizeOfManagementStructure % 4196 == 0? 0 : 1);
+    uint32_t sizeOfManagementStructureInPages = sizeOfManagementStructure / 4096 + (sizeOfManagementStructure % 4096 == 0? 0 : 1);
     uint32_t numberOfAvaliablePages = numberOfKernelBlockPages - sizeOfKernelInPages - sizeOfManagementStructureInPages;
 
 
