@@ -1,0 +1,19 @@
+#ifndef ACPI_H
+#define ACPI_H
+
+#include <stddef.h>
+#include <stdint.h>
+#include "memcmp.h"
+#include "terminal.h"
+
+typedef struct{
+ char Signature[8];
+ uint8_t Checksum;
+ char OEMID[6];
+ uint8_t Revision;
+ uint32_t RsdtAddress;
+} RSDPDescriptor;
+
+RSDPDescriptor* acpi_findRSDP();
+
+#endif

@@ -1,6 +1,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "acpi.h"
 #include "terminal.h"
 #include "multiboot.h"
 #include "memtest.h"
@@ -37,6 +38,12 @@ void kernel_main(multiboot_info_t* mbd, unsigned int magic){
     terminal_writestring("\n");
 
     memory_printMMap(mbd);
+    
+    uint32_t* RSDP = acpi_findRSDP();
+
+    terminal_writestring("RSDP: ");
+    terminalWriteHexInt((int32_t)RSDP);
+    terminal_writestring("\n");
 
     terminal_writestring("Initalising physical memory manager...\n");
     uint32_t* physicalMemoryManagerAddress = initialisePhysicalMemory(mbd, kernelEnd);
@@ -86,6 +93,7 @@ void kernel_main(multiboot_info_t* mbd, unsigned int magic){
 
     terminal_writestring("\n");
 
+    kfree(testMemory);
    
 /*
     if(memCheck(mbd) == 1){

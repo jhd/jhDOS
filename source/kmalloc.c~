@@ -156,7 +156,7 @@ uint32_t kfree(void* address){
 
             /* The previous block is in another page so the blocks can't be combined */
 
-            *(memory - 12) = (*(memory - 12) * -1 + 12);
+            *(memory - 12) = (uint32_t)(*(memory - 12) * -1 + 12);
             
             return 1;
 
