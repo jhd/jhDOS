@@ -39,11 +39,13 @@ void kernel_main(multiboot_info_t* mbd, unsigned int magic){
 
     memory_printMMap(mbd);
     
-    uint32_t* RSDP = acpi_findRSDP();
+    RSDPDescriptor* RSDP = acpi_findRSDP();
 
     terminal_writestring("RSDP: ");
     terminalWriteHexInt((int32_t)RSDP);
     terminal_writestring("\n");
+
+    acpi_printRSDP(RSDP);
 
     terminal_writestring("Initalising physical memory manager...\n");
     uint32_t* physicalMemoryManagerAddress = initialisePhysicalMemory(mbd, kernelEnd);

@@ -15,6 +15,6 @@ typedef struct{
 } RSDPDescriptor;
 
 RSDPDescriptor* acpi_findRSDP();
-void acpi_printRSDP(RSDPDescriptor* RSDP);
+void acpi_printRSDP(RSPDescriptor* RSDP);
 
 #endif

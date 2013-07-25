@@ -3,6 +3,7 @@
 
 #include "acpi.h"
 #include "memcmp.h"
+#include "terminal.h"
 
 RSDPDescriptor* acpi_findRSDP(){
     
@@ -29,6 +30,30 @@ RSDPDescriptor* acpi_findRSDP(){
 */
 
     return NULL;
+
+}
+
+void acpi_printRSDP(RSDPDescriptor* RSDP){
+
+    terminal_writestring("OEM: ");
+
+    for(uint32_t i = 0; i < 6; i++){
+
+        terminal_putchar(RSDP->OEMID[i]);
+
+    }
+
+    terminal_writestring("\n");
+
+    terminal_writestring("Revision: ");
+    terminalWriteInt(RSDP->Revision);
+    terminal_writestring("\n");
+
+    terminal_writestring("RSDT Address: ");
+    terminalWriteHexInt(RSDP->RsdtAddress);
+    terminal_writestring("\n");
+
+    return;
 
 }
 
