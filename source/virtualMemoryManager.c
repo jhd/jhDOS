@@ -7,11 +7,11 @@
 
 /* Sets up identity paging for the kernel and memory management structures and enables paging */
 
-uint32_t* intialisePaging(multiboot_info_t* mbd, uint32_t numberOfInUsePages){
+uint32_t* virtualMemoryManager_intialisePaging(multiboot_info_t* mbd, uint32_t* endOfInUsePages){
     
     uint32_t* pageDirectory = physicalMemoryManager_getPage();
     
-    for(int i = 0; i < 1024; i++){
+    for(uint32_t i = 0; i < 1024; i++){
 
         /* attribute: supervisor level, read/write, not present. */
         pageDirectory[i] = 0 | 2;
@@ -20,21 +20,17 @@ uint32_t* intialisePaging(multiboot_info_t* mbd, uint32_t numberOfInUsePages){
 
     /* Identity map the entire memory space */
 
-    /* Memory for VGA terminal */
-    /* Attributes: supervisor level, read/write, present */
-
-    mapPage(pageDirectory, (void*)(0xb8000 & 0xfffff000), (void*)(0xb8000 & 0xfffff000), 3);
-    
     /* Memory for kernel and physical memory manager */
     
-    uint32_t i;
-    for(i = 1; i < numberOfInUsePages + 1; i++){
+    for(uint32_t i = 0; i < endOfInUsePages; i += 4096){
         
-        mapPage(pageDirectory, (void*)(0x1000000 + i * 4196), (void*)(0x1000000 + i * 4196), 3);
+        mapPage(pageDirectory, (void*)(i), (void*)(i), 3);
 
     }
+
+    /*Map the pageDirectory into itself */
     
-    mapPage(pageDirectory, pageDirectory, pageDirectory, 3);
+    mapPage(pageDirectory, pageDirectory, endOfInUsePages, 3);
     
     /* Enable paging */
     
@@ -51,7 +47,7 @@ uint32_t* intialisePaging(multiboot_info_t* mbd, uint32_t numberOfInUsePages){
 
 /* Insert a map of virtualAddress -> physicalAddress into pageDirectory with attributes flags */
 
-void mapPage(uint32_t* pageDirectory, void* physicalAddress, void* virtualAddress, uint32_t flags){
+void virtualMemoryManager_mapPage(uint32_t* pageDirectory, void* physicalAddress, void* virtualAddress, uint32_t flags){
     
     uint32_t pageDirectoryIndex = (uint32_t)virtualAddress >> 22;
     uint32_t pageTableIndex = (uint32_t)virtualAddress >> 12 & 0x03ff;
